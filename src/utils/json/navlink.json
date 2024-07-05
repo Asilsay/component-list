@@ -1,0 +1,11 @@
+{
+  "data": [
+    {
+      "id": 1,
+      "name": "alert",
+      "styling": "tailwind",
+      "pack": "daisyui",
+      "navlink": "/alert"
+    }
+  ]
+}
