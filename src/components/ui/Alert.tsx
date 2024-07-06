@@ -9,6 +9,14 @@ export interface AlertType {
 const Alert: FC<AlertType> = ({ modalName }) => {
   const { modalType, judul, text, onClickAction, actionButtonLabel } = useAlertStore();
 
+  const closeSingle = () => {
+    const alert = document.getElementById(modalName) as HTMLDialogElement | null;
+
+    if (alert) {
+      alert.close();
+    }
+  };
+
   return (
     <dialog
       id={modalName}
@@ -68,24 +76,23 @@ const Alert: FC<AlertType> = ({ modalName }) => {
              
           `}
             >
-              <form method="dialog">
-                <button
-                  id="btn-closemodal"
-                  className={`w-20  btn ${
-                    actionButtonLabel
-                      ? 'btn-ghost text-black dark:text-white'
-                      : modalType === 'success'
-                      ? 'btn-success text-white dark:text-black'
-                      : modalType === 'warning'
-                      ? 'btn-warning text-white dark:text-black'
-                      : modalType === 'error'
-                      ? 'btn-accent text-white dark:text-black'
-                      : 'btn-info text-white dark:text-black'
-                  } rounded-md btn-sm !h-10`}
-                >
-                  {actionButtonLabel ? 'TUTUP' : 'OK'}
-                </button>
-              </form>
+              <button
+                onClick={closeSingle}
+                id="btn-closemodal"
+                className={`w-20  btn ${
+                  actionButtonLabel
+                    ? 'btn-ghost text-black dark:text-white'
+                    : modalType === 'success'
+                    ? 'btn-success text-white dark:text-black'
+                    : modalType === 'warning'
+                    ? 'btn-warning text-white dark:text-black'
+                    : modalType === 'error'
+                    ? 'btn-accent text-white dark:text-black'
+                    : 'btn-info text-white dark:text-black'
+                } rounded-md btn-sm !h-10`}
+              >
+                {actionButtonLabel ? 'TUTUP' : 'OK'}
+              </button>
 
               {actionButtonLabel ? (
                 <form method="dialog">

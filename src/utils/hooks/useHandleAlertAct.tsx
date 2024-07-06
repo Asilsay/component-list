@@ -10,7 +10,7 @@ export const useHandleAlertAction = () => {
       judul: string;
       text: string | null;
       actionButtonLabel: string | null;
-      onClickAction?: () => void;
+      onClickAction?: () => void | Promise<void>;
     }
   ) => {
     if (document) {
