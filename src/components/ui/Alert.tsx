@@ -1,6 +1,5 @@
-import { closeAllAlert } from '@/utils/hooks/useHandleAlertAct';
 import { useAlertStore } from '@/utils/store/useAlertStore';
-import { FC, useCallback, useEffect } from 'react';
+import { FC } from 'react';
 import { FaCheck, FaExclamation, FaInfo, FaQuestion, FaXmark } from 'react-icons/fa6';
 
 export interface AlertType {
@@ -9,28 +8,15 @@ export interface AlertType {
 }
 
 const Alert: FC<AlertType> = ({ modalName, onClose }) => {
-  const { modalType, judul, text, onClickAction, actionButtonLabel, isLoading, type } =
+  const { modalType, judul, text, onClickAction, actionButtonLabel, type } =
     useAlertStore();
 
-  const handleEscKey = useCallback(
-    (event: { key: string; preventDefault: () => void }) => {
-      if (event.key === 'Escape' && isLoading) {
-        event.preventDefault(); // Prevent closing the dialog if loading
-      }
-    },
-    [isLoading]
-  );
-
-  useEffect(() => {
-    document.addEventListener('keydown', handleEscKey);
-    return () => {
-      document.removeEventListener('keydown', handleEscKey);
-    };
-  }, [handleEscKey]);
-
-  useEffect(() => {
-    console.log(isLoading);
-  }, [isLoading]);
+  const handleOnClick = () => {
+    if (onClickAction && onClose) {
+      onClickAction();
+      onClose();
+    }
+  };
 
   return (
     <dialog
@@ -46,18 +32,18 @@ const Alert: FC<AlertType> = ({ modalName, onClose }) => {
           >
             <div
               className={`w-16 h-16 rounded-full ring-8 ring-base100/20 border-4 flex justify-center items-center
-          ${
-            modalType === 'success'
-              ? 'text-primary  border-primary ring-primary/20'
-              : modalType === 'warning'
-              ? 'text-warning  border-warning ring-warning/20'
-              : modalType === 'error'
-              ? 'text-accent  border-accent ring-accent/20'
-              : 'text-info  border-info ring-info/20'
-          }
-          
-          
-          `}
+      ${
+        modalType === 'success'
+          ? 'text-primary  border-primary ring-primary/20'
+          : modalType === 'warning'
+          ? 'text-warning  border-warning ring-warning/20'
+          : modalType === 'error'
+          ? 'text-accent  border-accent ring-accent/20'
+          : 'text-info  border-info ring-info/20'
+      }
+      
+      
+      `}
             >
               {modalType === 'success' ? (
                 <FaCheck size={45} />
@@ -88,15 +74,14 @@ const Alert: FC<AlertType> = ({ modalName, onClose }) => {
 
             <div
               className={`flex w-full gap-3 justify-center items-center 
-             
-          `}
+         
+      `}
             >
               {type === '1-nothing' ? (
                 <ReusableButton
                   id="btn-alert-1-nothing"
                   label={'OKE'}
                   modalType={modalType}
-                  isLoading={null}
                   onClick={() => onClose && onClose()}
                   variant="close"
                 />
@@ -105,8 +90,7 @@ const Alert: FC<AlertType> = ({ modalName, onClose }) => {
                   id="btn-alert-1-func"
                   actionButtonLabel={actionButtonLabel}
                   modalType={modalType}
-                  isLoading={isLoading}
-                  onClick={onClickAction}
+                  onClick={handleOnClick}
                   variant="action"
                 />
               ) : type === '2-nothing' ? (
@@ -115,7 +99,6 @@ const Alert: FC<AlertType> = ({ modalName, onClose }) => {
                     id="btn-alert-2-nothing-cancel"
                     label={'BATAL'}
                     modalType={modalType}
-                    isLoading={null}
                     onClick={() => onClose && onClose()}
                     variant="close"
                   />
@@ -123,8 +106,7 @@ const Alert: FC<AlertType> = ({ modalName, onClose }) => {
                     id="btn-alert-2-nothing-func"
                     actionButtonLabel={actionButtonLabel}
                     modalType={modalType}
-                    isLoading={isLoading}
-                    onClick={onClickAction}
+                    onClick={() => onClose && onClose()}
                     variant="action"
                   />
                 </>
@@ -134,7 +116,6 @@ const Alert: FC<AlertType> = ({ modalName, onClose }) => {
                     id="btn-alert-2-func-cancel"
                     label={'BATAL'}
                     modalType={modalType}
-                    isLoading={null}
                     onClick={() => onClose && onClose()}
                     variant="close"
                   />
@@ -142,8 +123,7 @@ const Alert: FC<AlertType> = ({ modalName, onClose }) => {
                     id="btn-alert-2-func"
                     actionButtonLabel={actionButtonLabel}
                     modalType={modalType}
-                    isLoading={isLoading}
-                    onClick={onClickAction}
+                    onClick={handleOnClick}
                     variant="action"
                   />
                 </>
@@ -163,7 +143,6 @@ interface ReusableButtonProps {
   label?: string;
   modalType: string | null;
   actionButtonLabel?: string | null;
-  isLoading: boolean | null;
   onClick?: () => void | Promise<void>;
   variant?: 'close' | 'action';
 }
@@ -173,23 +152,9 @@ const ReusableButton: FC<ReusableButtonProps> = ({
   label,
   modalType = 'info',
   actionButtonLabel,
-  isLoading,
   onClick,
   variant = 'action',
 }) => {
-  const { setIsLoading } = useAlertStore();
-
-  const handleClick = async () => {
-    if (onClick) {
-      setIsLoading(true);
-      await onClick();
-      setIsLoading(false);
-      closeAllAlert();
-    } else {
-      closeAllAlert();
-    }
-  };
-
   const getButtonClasses = () => {
     const baseClasses = 'w-20 btn rounded-md btn-sm !h-10';
     let typeClass = '';
@@ -223,14 +188,9 @@ const ReusableButton: FC<ReusableButtonProps> = ({
     <button
       id={id}
       className={getButtonClasses()}
-      disabled={isLoading ?? false}
-      onClick={handleClick}
+      onClick={onClick}
     >
-      {isLoading ? (
-        <span className="loading loading-spinner"></span>
-      ) : (
-        actionButtonLabel ?? label ?? 'OKE'
-      )}
+      {actionButtonLabel ?? label ?? 'OKE'}
     </button>
   );
 };

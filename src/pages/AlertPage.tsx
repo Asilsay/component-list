@@ -1,23 +1,22 @@
 import Layout from '@/components/Layout';
 import { useHandleAlertAction } from '@/utils/hooks/useHandleAlertAct';
-import { useState } from 'react';
+import { useOpacityLoading } from '@/utils/store/useOpacityLoading';
 import { useNavigate } from 'react-router-dom';
 
 type AlertType = 'warning' | 'error' | 'info' | 'success' | 'question';
 
 const AlertPage = () => {
   const handleAlertAction = useHandleAlertAction();
+  const { setLoadState } = useOpacityLoading();
 
-  const [load, setLoad] = useState(false);
   const navigate = useNavigate();
 
   const handleAlert = async (type: AlertType) => {
     handleAlertAction(type, {
       judul: 'Alert',
       text: `Text ${type}`,
-      actionButtonLabel: 'ok',
-      disable: load,
-      type: '1-func',
+      actionButtonLabel: 'OKE',
+      type: '2-func',
       onClickAction: () => {
         dummyFetch();
       },
@@ -25,11 +24,11 @@ const AlertPage = () => {
   };
 
   const dummyFetch = async () => {
-    setLoad(true);
+    setLoadState(true);
     setTimeout(() => {
       navigate('/alert');
-      setLoad(false);
-    }, 2000);
+      setLoadState(false);
+    }, 10000);
   };
 
   const dataAlert: AlertType[] = ['error', 'warning', 'info', 'success', 'question'];
@@ -43,14 +42,11 @@ const AlertPage = () => {
               id={`btn-alert-${item}`}
               onClick={() => handleAlert(item)}
               className="text-sm btn btn-ghost btn-xs btn-square text-green-400"
-              disabled={load}
             >
               {item}
             </button>
           );
         })}
-        {load && <div className="mt-3 text-center">Loading...</div>}{' '}
-        {/* Display loading text */}
       </div>
     </Layout>
   );

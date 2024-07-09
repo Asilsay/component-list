@@ -7,7 +7,6 @@ export const useHandleAlertAction = () => {
     setText,
     setActionButtonLabel,
     setOnClickAction,
-    setIsLoading,
     setType,
   } = useAlertStore();
 
@@ -18,7 +17,6 @@ export const useHandleAlertAction = () => {
       text: string | null;
       actionButtonLabel: string | null;
       onClickAction?: () => void | Promise<void>;
-      disable: boolean | null;
       type: '1-nothing' | '1-func' | '2-nothing' | '2-func';
     }
   ) => {
@@ -33,7 +31,6 @@ export const useHandleAlertAction = () => {
         setJudul(customData.judul);
         setText(customData.text);
         setActionButtonLabel(customData.actionButtonLabel);
-        setIsLoading(customData.disable);
         setType(customData.type);
         customData.onClickAction && setOnClickAction(customData.onClickAction);
       }

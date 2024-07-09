@@ -1,5 +1,7 @@
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import Alert from './ui/Alert';
+import LoadingPage from './ui/LoadingPage';
+import { useOpacityLoading } from '@/utils/store/useOpacityLoading';
 
 interface Props {
   label: string;
@@ -7,6 +9,8 @@ interface Props {
 }
 
 const Layout: FC<Props> = ({ children, label }) => {
+  const { loadState } = useOpacityLoading();
+
   const closeAlert = (modalName: string) => {
     const alertElement = document.getElementById(modalName) as HTMLDialogElement | null;
     if (alertElement) {
@@ -14,8 +18,13 @@ const Layout: FC<Props> = ({ children, label }) => {
     }
   };
 
+  useEffect(() => {
+    console.log(loadState);
+  }, [loadState]);
+
   return (
     <section className="flex flex-col gap-3 items-center justify-center w-full h-screen">
+      {loadState && <LoadingPage />}
       <Alert
         modalName="error"
         onClose={() => closeAlert('error')}
@@ -36,7 +45,6 @@ const Layout: FC<Props> = ({ children, label }) => {
         modalName="question"
         onClose={() => closeAlert('question')}
       />
-      <Alert modalName="question" />
       <p className="text-2xl">{label}</p>
       {children}{' '}
     </section>
