@@ -12,7 +12,7 @@ const RouterDom = () => {
       <Suspense fallback={'loading ...'}>
         <Routes>
           <Route
-            path="/home"
+            path="/"
             element={<Home />}
           />
           <Route

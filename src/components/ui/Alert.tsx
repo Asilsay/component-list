@@ -1,21 +1,36 @@
+import { closeAllAlert } from '@/utils/hooks/useHandleAlertAct';
 import { useAlertStore } from '@/utils/store/useAlertStore';
-import { FC } from 'react';
+import { FC, useCallback, useEffect } from 'react';
 import { FaCheck, FaExclamation, FaInfo, FaQuestion, FaXmark } from 'react-icons/fa6';
 
 export interface AlertType {
   modalName: string;
+  onClose?: () => void;
 }
 
-const Alert: FC<AlertType> = ({ modalName }) => {
-  const { modalType, judul, text, onClickAction, actionButtonLabel } = useAlertStore();
+const Alert: FC<AlertType> = ({ modalName, onClose }) => {
+  const { modalType, judul, text, onClickAction, actionButtonLabel, isLoading, type } =
+    useAlertStore();
 
-  const closeSingle = () => {
-    const alert = document.getElementById(modalName) as HTMLDialogElement | null;
+  const handleEscKey = useCallback(
+    (event: { key: string; preventDefault: () => void }) => {
+      if (event.key === 'Escape' && isLoading) {
+        event.preventDefault(); // Prevent closing the dialog if loading
+      }
+    },
+    [isLoading]
+  );
 
-    if (alert) {
-      alert.close();
-    }
-  };
+  useEffect(() => {
+    document.addEventListener('keydown', handleEscKey);
+    return () => {
+      document.removeEventListener('keydown', handleEscKey);
+    };
+  }, [handleEscKey]);
+
+  useEffect(() => {
+    console.log(isLoading);
+  }, [isLoading]);
 
   return (
     <dialog
@@ -76,44 +91,62 @@ const Alert: FC<AlertType> = ({ modalName }) => {
              
           `}
             >
-              <button
-                onClick={closeSingle}
-                id="btn-closemodal"
-                className={`w-20  btn ${
-                  actionButtonLabel
-                    ? 'btn-ghost text-black dark:text-white'
-                    : modalType === 'success'
-                    ? 'btn-success text-white dark:text-black'
-                    : modalType === 'warning'
-                    ? 'btn-warning text-white dark:text-black'
-                    : modalType === 'error'
-                    ? 'btn-accent text-white dark:text-black'
-                    : 'btn-info text-white dark:text-black'
-                } rounded-md btn-sm !h-10`}
-              >
-                {actionButtonLabel ? 'TUTUP' : 'OK'}
-              </button>
-
-              {actionButtonLabel ? (
-                <form method="dialog">
-                  <button
-                    id="btn-submit-form"
+              {type === '1-nothing' ? (
+                <ReusableButton
+                  id="btn-alert-1-nothing"
+                  label={'OKE'}
+                  modalType={modalType}
+                  isLoading={null}
+                  onClick={() => onClose && onClose()}
+                  variant="close"
+                />
+              ) : type === '1-func' ? (
+                <ReusableButton
+                  id="btn-alert-1-func"
+                  actionButtonLabel={actionButtonLabel}
+                  modalType={modalType}
+                  isLoading={isLoading}
+                  onClick={onClickAction}
+                  variant="action"
+                />
+              ) : type === '2-nothing' ? (
+                <>
+                  <ReusableButton
+                    id="btn-alert-2-nothing-cancel"
+                    label={'BATAL'}
+                    modalType={modalType}
+                    isLoading={null}
+                    onClick={() => onClose && onClose()}
+                    variant="close"
+                  />
+                  <ReusableButton
+                    id="btn-alert-2-nothing-func"
+                    actionButtonLabel={actionButtonLabel}
+                    modalType={modalType}
+                    isLoading={isLoading}
                     onClick={onClickAction}
-                    className={`w-20 btn  ${
-                      modalType === 'success'
-                        ? 'btn-success'
-                        : modalType === 'warning'
-                        ? 'btn-warning'
-                        : modalType === 'error'
-                        ? 'btn-accent'
-                        : 'btn-info'
-                    } text-white dark:text-black rounded-md btn-sm !h-10`}
-                  >
-                    {actionButtonLabel}
-                  </button>
-                </form>
+                    variant="action"
+                  />
+                </>
               ) : (
-                <></>
+                <>
+                  <ReusableButton
+                    id="btn-alert-2-func-cancel"
+                    label={'BATAL'}
+                    modalType={modalType}
+                    isLoading={null}
+                    onClick={() => onClose && onClose()}
+                    variant="close"
+                  />
+                  <ReusableButton
+                    id="btn-alert-2-func"
+                    actionButtonLabel={actionButtonLabel}
+                    modalType={modalType}
+                    isLoading={isLoading}
+                    onClick={onClickAction}
+                    variant="action"
+                  />
+                </>
               )}
             </div>
           </div>
@@ -124,3 +157,80 @@ const Alert: FC<AlertType> = ({ modalName }) => {
 };
 
 export default Alert;
+
+interface ReusableButtonProps {
+  id: string;
+  label?: string;
+  modalType: string | null;
+  actionButtonLabel?: string | null;
+  isLoading: boolean | null;
+  onClick?: () => void | Promise<void>;
+  variant?: 'close' | 'action';
+}
+
+const ReusableButton: FC<ReusableButtonProps> = ({
+  id,
+  label,
+  modalType = 'info',
+  actionButtonLabel,
+  isLoading,
+  onClick,
+  variant = 'action',
+}) => {
+  const { setIsLoading } = useAlertStore();
+
+  const handleClick = async () => {
+    if (onClick) {
+      setIsLoading(true);
+      await onClick();
+      setIsLoading(false);
+      closeAllAlert();
+    } else {
+      closeAllAlert();
+    }
+  };
+
+  const getButtonClasses = () => {
+    const baseClasses = 'w-20 btn rounded-md btn-sm !h-10';
+    let typeClass = '';
+    let txtColor = '';
+
+    switch (modalType) {
+      case 'success':
+        typeClass = 'btn-success';
+        break;
+      case 'warning':
+        typeClass = 'btn-warning';
+        break;
+      case 'error':
+        typeClass = 'btn-accent';
+        break;
+      default:
+        typeClass = 'btn-info';
+    }
+
+    if (variant === 'close') {
+      typeClass = 'btn-ghost';
+      txtColor = 'text-black dark:text-white';
+    } else {
+      txtColor = 'text-white dark:text-black';
+    }
+
+    return `${baseClasses} ${typeClass} ${txtColor}`;
+  };
+
+  return (
+    <button
+      id={id}
+      className={getButtonClasses()}
+      disabled={isLoading ?? false}
+      onClick={handleClick}
+    >
+      {isLoading ? (
+        <span className="loading loading-spinner"></span>
+      ) : (
+        actionButtonLabel ?? label ?? 'OKE'
+      )}
+    </button>
+  );
+};

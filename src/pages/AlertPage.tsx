@@ -7,6 +7,7 @@ type AlertType = 'warning' | 'error' | 'info' | 'success' | 'question';
 
 const AlertPage = () => {
   const handleAlertAction = useHandleAlertAction();
+
   const [load, setLoad] = useState(false);
   const navigate = useNavigate();
 
@@ -15,17 +16,18 @@ const AlertPage = () => {
       judul: 'Alert',
       text: `Text ${type}`,
       actionButtonLabel: 'ok',
+      disable: load,
+      type: '1-func',
       onClickAction: () => {
         dummyFetch();
       },
     });
   };
 
-  const dummyFetch = () => {
+  const dummyFetch = async () => {
     setLoad(true);
     setTimeout(() => {
-      // alert('clicked');
-      navigate('/home');
+      navigate('/alert');
       setLoad(false);
     }, 2000);
   };
@@ -41,7 +43,7 @@ const AlertPage = () => {
               id={`btn-alert-${item}`}
               onClick={() => handleAlert(item)}
               className="text-sm btn btn-ghost btn-xs btn-square text-green-400"
-              disabled={load} // Disable button while loading
+              disabled={load}
             >
               {item}
             </button>

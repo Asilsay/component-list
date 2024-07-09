@@ -1,8 +1,15 @@
 import { useAlertStore } from '../store/useAlertStore';
 
 export const useHandleAlertAction = () => {
-  const { setModalType, setJudul, setText, setActionButtonLabel, setOnClickAction } =
-    useAlertStore();
+  const {
+    setModalType,
+    setJudul,
+    setText,
+    setActionButtonLabel,
+    setOnClickAction,
+    setIsLoading,
+    setType,
+  } = useAlertStore();
 
   const handleAlertAction = (
     action: 'warning' | 'error' | 'info' | 'success' | 'question',
@@ -11,6 +18,8 @@ export const useHandleAlertAction = () => {
       text: string | null;
       actionButtonLabel: string | null;
       onClickAction?: () => void | Promise<void>;
+      disable: boolean | null;
+      type: '1-nothing' | '1-func' | '2-nothing' | '2-func';
     }
   ) => {
     if (document) {
@@ -24,6 +33,8 @@ export const useHandleAlertAction = () => {
         setJudul(customData.judul);
         setText(customData.text);
         setActionButtonLabel(customData.actionButtonLabel);
+        setIsLoading(customData.disable);
+        setType(customData.type);
         customData.onClickAction && setOnClickAction(customData.onClickAction);
       }
     }

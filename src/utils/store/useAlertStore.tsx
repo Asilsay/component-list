@@ -7,7 +7,7 @@ type AlertStore = {
   type: string;
   actionButtonLabel: string | null;
   onClickAction: (() => void | Promise<void>) | undefined;
-  isLoading: boolean;
+  isLoading: boolean | null;
 
   setModalType: (modalType: string | null) => void;
   setJudul: (judul: string) => void;
@@ -15,7 +15,7 @@ type AlertStore = {
   setType: (type: string) => void;
   setActionButtonLabel: (actionButtonLabel: string | null) => void;
   setOnClickAction: (onClickAction: (() => void | Promise<void>) | undefined) => void;
-  setIsLoading: (isLoading: boolean) => void;
+  setIsLoading: (isLoading: boolean | null) => void;
 };
 
 export const useAlertStore = create<AlertStore>((set) => {
@@ -26,7 +26,7 @@ export const useAlertStore = create<AlertStore>((set) => {
     type: '',
     actionButtonLabel: null,
     onClickAction: undefined,
-    isLoading: false,
+    isLoading: null,
 
     setModalType: (modalType) => set((state) => ({ ...state, modalType })),
     setJudul: (judul) => set((state) => ({ ...state, judul })),

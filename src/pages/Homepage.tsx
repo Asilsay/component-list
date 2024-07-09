@@ -1,7 +1,8 @@
 import Layout from '@/components/Layout';
 import { data } from '@/utils/json/navlink.json';
+import useThemeStore from '@/utils/store/useThemeStore';
 import { useEffect, useState } from 'react';
-import { FaRocket } from 'react-icons/fa6';
+import { FaMoon, FaRocket } from 'react-icons/fa6';
 import { useNavigate } from 'react-router-dom';
 
 interface routeData {
@@ -15,6 +16,8 @@ interface routeData {
 const Homepage = () => {
   const [load, setLoad] = useState(false);
   const [routeData, setRouteData] = useState<routeData[]>([]);
+
+  const { toggleTheme } = useThemeStore();
 
   const navigate = useNavigate();
 
@@ -30,6 +33,13 @@ const Homepage = () => {
   return (
     <Layout label="HOMEPAGE">
       <div className="md:w-96 lg:w-[768px]">
+        <button
+          onClick={toggleTheme}
+          className="text-sm btn btn-ghost btn-xs"
+        >
+          <FaMoon />
+        </button>
+
         <table className="static table table-xs lg:table-sm">
           <thead className="bg-gray-900/20 dark:bg-gray-900 dark:text-gray-300">
             <tr>
